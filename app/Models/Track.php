@@ -18,9 +18,10 @@ class Track extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'title',
         'artist',
+        'title',
         'url',
+        'category_id',
     ];
 
     /**
@@ -66,5 +67,10 @@ class Track extends Model
         return $query->withCount('likes')
             ->orderBy('likes_count', 'desc')
             ->orderBy('created_at', 'asc');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 }
