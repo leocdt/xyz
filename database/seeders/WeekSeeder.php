@@ -3,34 +3,28 @@
 namespace Database\Seeders;
 
 use App\Models\Week;
-use App\Services\WeekService;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
 class WeekSeeder extends Seeder
 {
-    /**
-     * Inject WeekService.
-     */
-    public function __construct(
-        protected WeekService $service
-    ) { 
-        //
-    }
-
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $weeks = $this->service
-            ->previousUntil(6, now()->addYear())
-            ->map(fn ($period) => [
-                'year' => $period->getStartDate()->get('year'),
-                'week_number' => $period->getStartDate()->get('week'),
-                'week_starts_at' => $period->getStartDate()->format("Y-m-d H:i:s"),
-                'week_ends_at' => $period->getEndDate()->format("Y-m-d H:i:s"),
-            ]);
+        $start = Carbon::now()->startOfWeek();
+        $end = $start->copy()->addWeeks(52);
 
-        Week::insert($weeks->toArray());
+        while ($start < $end) {
+            Week::updateOrCreate(
+                [
+                    'year' => $start->year,
+                    'week_number' => $start->weekOfYear,
+                ],
+                [
+                    'week_starts_at' => $start->copy()->startOfWeek(),
+                    'week_ends_at' => $start->copy()->endOfWeek(),
+                ]
+            );
+            $start->addWeek();
+        }
     }
 }
