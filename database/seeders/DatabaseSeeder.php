@@ -15,8 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create weeks
-        $this->call(WeekSeeder::class);
+        $this->call([
+            CategorySeeder::class,
+            WeekSeeder::class,
+        ]);
 
         // Create content
         User::factory()
